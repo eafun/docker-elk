@@ -24,7 +24,7 @@ App Search home page.
 App Search is configured on first boot with the following default credentials:
 
 * user: *app_search*
-* password: *changeme*
+* password: *test1234*
 
 ## Security
 

@@ -1,25 +1,37 @@
 version: '3.2'
 
 services:
+  mysql:
+    image: mysql:5.7        
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=test1234
+    volumes:
+      - "/D/mysql/data:/var/lib/mysql" 
+      - "/D/mysql/config:/etc/mysql/conf.d" 
+    networks:
+      - elk
+
   elasticsearch:
-    build:
-      context: elasticsearch/
-      args:
-        ELK_VERSION: $ELK_VERSION
+    image: elasticsearch:7.2.0
+    container_name: elasticsearch
     volumes:
       - type: bind
         source: ./elasticsearch/config/elasticsearch.yml
         target: /usr/share/elasticsearch/config/elasticsearch.yml
         read_only: true
-      - type: volume
-        source: elasticsearch
-        target: /usr/share/elasticsearch/data
+      # - type: volume
+      #   source: elasticsearch
+      #   target: /usr/share/elasticsearch/data
     ports:
       - "9200:9200"
       - "9300:9300"
     environment:
       ES_JAVA_OPTS: "-Xmx256m -Xms256m"
-      ELASTIC_PASSWORD: changeme
+      ELASTIC_PASSWORD: test1234
       # Use single node discovery in order to disable production mode and avoid bootstrap checks
       # see https://www.elastic.co/guide/en/elasticsearch/reference/current/bootstrap-checks.html
       discovery.type: single-node
@@ -27,10 +39,8 @@ services:
       - elk
 
   logstash:
-    build:
-      context: logstash/
-      args:
-        ELK_VERSION: $ELK_VERSION
+    image: logstash:7.2.0
+    container_name: logstash
     volumes:
       - type: bind
         source: ./logstash/config/logstash.yml
@@ -52,10 +62,8 @@ services:
       - elasticsearch
 
   kibana:
-    build:
-      context: kibana/
-      args:
-        ELK_VERSION: $ELK_VERSION
+    image: kibana:7.2.0
+    container_name: kibana
     volumes:
       - type: bind
         source: ./kibana/config/kibana.yml
@@ -71,6 +79,6 @@ services:
 networks:
   elk:
     driver: bridge
-
+    
 volumes:
   elasticsearch:
